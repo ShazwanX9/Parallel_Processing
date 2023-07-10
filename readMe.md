@@ -19,9 +19,8 @@ Parallel processing is a fascinating subject that explores the concept of execut
 The repository is structured as follows:
 
 - `src/`: This directory contains the source code files.
-- `docs/`: This directory contains the documentation and related resources.
-- `examples/`: This directory contains example programs showcasing parallel processing techniques.
-- `tests/`: This directory contains test cases and test data.
+- `resources/`: This directory contains the related resources.
+- `instructions/`: This directory contains serial programs, instructions and example programs showcasing parallel processing techniques.
 - `README.md`: This file provides an overview of the repository and instructions on how to use the code.
 
 ## Getting Started
