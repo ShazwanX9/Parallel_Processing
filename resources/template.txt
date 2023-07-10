@@ -1,0 +1,95 @@
+// Import Library as usual
+#include <stdio.h>	// Standard I/O
+#include <mpi.h>	// To Use MPI
+
+// function prototype [ basic c ]
+int f(int);
+
+int main(int argc, char **argv) {
+    int myrank, numprocs;
+
+	// variable declaration
+	int nPartition;
+	double result, localResult, start, end;
+	double btime;
+
+	// For Initialization
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+
+	if (!my_rank) {
+		// DO SOMETHING SERIAL HERE
+		
+		// Example Get Input from User
+		printf("Enter Partitions: ");
+		fflush(stdout);
+		scanf("%d", &nPartition);
+
+		// Example serial calculation
+		double singleResult = serialCompute(nPartition);
+		printf("Result is %1.20f\n", singleResult);
+
+		// Example Serial timing
+		printf("Serial time: %1.20f\n", MPI_Wtime() - btime);
+		
+		// Example Time before parallel executed
+		btime = MPI_Wtime();
+	}
+
+	// DO SOMETHING PARALLEL HERE
+	
+	// Example Broadcast
+	MPI_Bcast(&nPartition, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	
+	// Example Local Computation
+	localResult = parallelCompute(nPartition);
+
+	// Example Total Computation
+	MPI_Reduce(&localResult, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+	if (!my_rank) {
+		// DO SOMETHING SERIAL HERE
+		
+		// Example Display time taken
+		printf("Parallel time: %1.20f\n", MPI_Wtime() - btime);
+		printf("\n");
+	}
+
+	// To Make it Work
+    MPI_Finalize();
+}
+
+// function definition [ basic c ]
+int f(int nPartition) {
+	return 0;
+};
+
+// Example taken from lab5q3
+// Make sure to write the prototype correctly
+
+double serialCompute(int nPartition, double a, double w, double middle) {
+	double sum=0;
+
+	// overall different is this line
+	// so we calculate each and every step 
+	// from 0 till number of partition reach
+	for(int i=0; i<nPartition; i++) { 
+		sum += f((a+i*w)+middle);
+	}
+	return sum * w;
+}
+
+double parallelCompute(int nPartition, double a, double w, double middle) {
+	double sum=0;
+
+	// overall different is this line
+	// we start from current rank and skips by numprocs
+	// say like total 2 rank and 10k partition
+	// 0, 2, 4, 6, 8, ....
+	// 1, 3, 5, 7, 9, ....
+	for(int i=my_rank; i<nPartition; i+=numprocs) { 
+		sum += f((a+i*w)+middle);
+	}
+	return sum * w;	
+}
